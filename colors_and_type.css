@@ -1,0 +1,210 @@
+/* ─────────────────────────────────────────────
+   Consors — core tokens
+   Colour, type, spacing, hairlines.
+   ─────────────────────────────────────────────*/
+
+/* Font substitutes — see README. Spectral ≈ Plantin MT Pro; Jost ≈ Gibson. */
+@import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@400;500;600&display=swap');
+
+:root {
+  /* Palette — exact values from Figma */
+  --obsidian:     #0E0E10;
+  --alabaster:    #F4F0E8;
+  --white:        #FFFFFF;
+  --stone:        #8A7F6E;
+  --oxblood:      #5A1A1F;
+  --gold:         #B08D57;
+
+  /* Semantic colour roles */
+  --ink:              var(--obsidian);
+  --ink-secondary:    var(--stone);
+  --ink-inverse:      var(--alabaster);
+  --ground:           var(--alabaster);       /* marketing default */
+  --surface:          var(--white);           /* reading default */
+  --accent-editorial: var(--oxblood);         /* links, accents, rules */
+  --accent-metal:     var(--gold);            /* credential, signet */
+
+  --hairline-strong: color-mix(in oklab, var(--obsidian) 60%, transparent);
+  --hairline:        color-mix(in oklab, var(--obsidian) 40%, transparent);
+  --hairline-soft:   color-mix(in oklab, var(--obsidian) 20%, transparent);
+  --hairline-metal:  color-mix(in oklab, var(--gold) 70%, transparent);
+
+  /* Type families */
+  --serif: "Plantin MT Pro", "Spectral", Georgia, "Times New Roman", serif;
+  --sans:  "Gibson", "Jost", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  /* Display scale (Plantin) */
+  --display-xxl: 64px;  /* hero headline, desktop */
+  --display-xl:  48px;  /* section opener */
+  --display-lg:  36px;  /* article title */
+  --display-md:  28px;  /* sub-headline */
+  --display-sm:  22px;  /* card title */
+  --display-xs:  18px;  /* deck */
+  --body-serif:  18px;  /* reading body */
+
+  /* UI scale (Gibson) */
+  --ui-lg:   18px;   /* lead UI */
+  --ui-md:   16px;   /* body UI */
+  --ui-sm:   14px;   /* metadata */
+  --ui-xs:   13px;   /* labels */
+  --ui-caps: 12px;   /* small caps, tracked */
+  --ui-micro:11px;   /* finest metadata */
+
+  /* Line heights */
+  --lh-display: 1.1;
+  --lh-body:    1.45;
+  --lh-ui:      1.3;
+
+  /* Tracking */
+  --track-caps:      0.12em;
+  --track-caps-tight:0.08em;
+
+  /* Spacing — named, not numeric */
+  --space-hairline:  0.5px;
+  --space-tight:     4px;
+  --space-small:     8px;
+  --space-close:     12px;
+  --space-default:   16px;
+  --space-roomy:     24px;
+  --space-wide:      32px;
+  --space-section:   48px;
+  --space-chapter:   72px;
+  --space-threshold: 96px;
+
+  /* Layout */
+  --measure: 62ch;
+  --gutter-desktop: 32px;
+  --gutter-mobile:  16px;
+  --margin-desktop: 96px;
+  --margin-mobile:  20px;
+
+  /* Radius — virtually always zero */
+  --radius-0: 0;
+  --radius-input: 2px;
+  --radius-signet: 50%;
+
+  /* Motion */
+  --ease:          cubic-bezier(0.2, 0, 0, 1);
+  --dur-fast:      200ms;
+  --dur-page:      400ms;
+  --dur-reveal:    600ms;
+}
+
+/* ─────────────────────────────────────────────
+   Element defaults — a tiny reset for mocks.
+   ─────────────────────────────────────────────*/
+
+html, body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: var(--body-serif);
+  line-height: var(--lh-body);
+  font-feature-settings: "onum", "liga", "kern";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: var(--serif);
+  font-weight: 400;
+  line-height: var(--lh-display);
+  letter-spacing: -0.005em;
+  margin: 0;
+}
+
+h1 { font-size: var(--display-xxl); }
+h2 { font-size: var(--display-xl);  }
+h3 { font-size: var(--display-lg);  }
+h4 { font-size: var(--display-md);  }
+h5 { font-size: var(--display-sm);  }
+
+p {
+  margin: 0 0 1em 0;
+  max-width: var(--measure);
+}
+
+em, i { font-style: italic; }
+
+a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 0.5px solid var(--hairline-strong);
+  transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+a:hover {
+  color: var(--oxblood);
+  border-bottom-color: var(--oxblood);
+}
+
+/* UI type utility classes */
+.ui       { font-family: var(--sans); font-size: var(--ui-md); line-height: var(--lh-ui); letter-spacing: 0.005em; }
+.ui-sm    { font-family: var(--sans); font-size: var(--ui-sm); line-height: var(--lh-ui); }
+.ui-caps  { font-family: var(--sans); font-size: var(--ui-caps); line-height: var(--lh-ui);
+            text-transform: uppercase; letter-spacing: var(--track-caps); font-weight: 500; }
+.ui-micro { font-family: var(--sans); font-size: var(--ui-micro); line-height: var(--lh-ui);
+            text-transform: uppercase; letter-spacing: var(--track-caps); color: var(--ink-secondary); }
+
+.caption  { font-family: var(--sans); font-size: var(--ui-caps); color: var(--ink-secondary);
+            line-height: var(--lh-ui); }
+
+.dropcap::first-letter {
+  font-family: var(--serif);
+  font-size: 4.4em;
+  line-height: 0.85;
+  float: left;
+  padding: 0.05em 0.08em 0 0;
+  color: var(--ink);
+}
+
+/* Decorative 32px rule, centred */
+.rule {
+  width: 32px;
+  height: 0;
+  border-top: 0.5px solid var(--oxblood);
+  margin: var(--space-section) auto;
+}
+
+.hairline-t { border-top: 0.5px solid var(--hairline); }
+.hairline-b { border-bottom: 0.5px solid var(--hairline); }
+
+/* Button */
+.btn {
+  font-family: var(--sans);
+  font-size: var(--ui-caps);
+  letter-spacing: var(--track-caps);
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 14px 28px;
+  background: var(--obsidian);
+  color: var(--alabaster);
+  border: 0.5px solid var(--obsidian);
+  border-radius: 0;
+  cursor: pointer;
+  transition: opacity var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.btn:hover { background: #1a1a1c; }
+.btn:active { opacity: 0.85; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--obsidian);
+  border: 0.5px solid var(--obsidian);
+}
+.btn-ghost:hover { background: var(--obsidian); color: var(--alabaster); }
+
+/* Input */
+.input {
+  font-family: var(--sans);
+  font-size: var(--ui-md);
+  padding: 12px 14px;
+  background: transparent;
+  color: var(--ink);
+  border: 0;
+  border-bottom: 0.5px solid var(--hairline-strong);
+  border-radius: 0;
+  outline: none;
+  width: 100%;
+}
+.input:focus { border-bottom-color: var(--obsidian); }
+.input::placeholder { color: var(--ink-secondary); }

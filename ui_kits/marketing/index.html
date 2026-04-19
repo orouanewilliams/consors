@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>Consors — a private publication and concierge</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  html,body { margin:0; background: #0E0E10; }
+  a { text-decoration: none; }
+  ::selection { background: #5A1A1F; color: #F4F0E8; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="app"></div>
+
+<script type="text/babel" src="Primitives.jsx"></script>
+<script type="text/babel" src="Tweaks.jsx"></script>
+<script type="text/babel" src="Nav.jsx"></script>
+<script type="text/babel" src="SectionHero.jsx"></script>
+<script type="text/babel" src="SectionPhilosophy.jsx"></script>
+<script type="text/babel" src="SectionCredential.jsx"></script>
+<script type="text/babel" src="SectionMembership.jsx"></script>
+<script type="text/babel" src="SectionPullQuote.jsx"></script>
+<script type="text/babel" src="SectionAgencies.jsx"></script>
+<script type="text/babel" src="SectionWhereWeMeet.jsx"></script>
+<script type="text/babel" src="SectionDiscretion.jsx"></script>
+<script type="text/babel" src="SectionApply.jsx"></script>
+
+<script type="text/babel">
+function Site() {
+  const { tweaks, set, open } = useTweaks();
+  return (
+    <>
+      <Nav/>
+      <SectionHero underCtaAlign={tweaks.underCtaAlign}/>
+      <SectionPhilosophy/>
+      <SectionCredential/>
+      <SectionMembership/>
+      <SectionPullQuote
+        fontSize={tweaks.quoteFontSize}
+        lineHeight={tweaks.quoteLineHeight}
+        maxWidth={tweaks.quoteMaxWidth}/>
+      <SectionAgencies/>
+      <SectionWhereWeMeet/>
+      <SectionDiscretion/>
+      <SectionApply/>
+      <TweaksPanel tweaks={tweaks} set={set} open={open}/>
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<Site/>);
+</script>
+</body></html>
