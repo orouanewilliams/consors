@@ -1,0 +1,1425 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>Consors — a private publication and concierge</title>
+<style>
+/* ─────────────────────────────────────────────
+   Consors — core tokens
+   Colour, type, spacing, hairlines.
+   ─────────────────────────────────────────────*/
+
+/* Font substitutes — see README. Spectral ≈ Plantin MT Pro; Jost ≈ Gibson. */
+@import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@400;500;600&display=swap');
+
+:root {
+  /* Palette — exact values from Figma */
+  --obsidian:     #0E0E10;
+  --alabaster:    #F4F0E8;
+  --white:        #FFFFFF;
+  --stone:        #8A7F6E;
+  --oxblood:      #5A1A1F;
+  --gold:         #B08D57;
+
+  /* Semantic colour roles */
+  --ink:              var(--obsidian);
+  --ink-secondary:    var(--stone);
+  --ink-inverse:      var(--alabaster);
+  --ground:           var(--alabaster);       /* marketing default */
+  --surface:          var(--white);           /* reading default */
+  --accent-editorial: var(--oxblood);         /* links, accents, rules */
+  --accent-metal:     var(--gold);            /* credential, signet */
+
+  --hairline-strong: color-mix(in oklab, var(--obsidian) 60%, transparent);
+  --hairline:        color-mix(in oklab, var(--obsidian) 40%, transparent);
+  --hairline-soft:   color-mix(in oklab, var(--obsidian) 20%, transparent);
+  --hairline-metal:  color-mix(in oklab, var(--gold) 70%, transparent);
+
+  /* Type families */
+  --serif: "Plantin MT Pro", "Spectral", Georgia, "Times New Roman", serif;
+  --sans:  "Gibson", "Jost", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  /* Display scale (Plantin) */
+  --display-xxl: 64px;  /* hero headline, desktop */
+  --display-xl:  48px;  /* section opener */
+  --display-lg:  36px;  /* article title */
+  --display-md:  28px;  /* sub-headline */
+  --display-sm:  22px;  /* card title */
+  --display-xs:  18px;  /* deck */
+  --body-serif:  18px;  /* reading body */
+
+  /* UI scale (Gibson) */
+  --ui-lg:   18px;   /* lead UI */
+  --ui-md:   16px;   /* body UI */
+  --ui-sm:   14px;   /* metadata */
+  --ui-xs:   13px;   /* labels */
+  --ui-caps: 12px;   /* small caps, tracked */
+  --ui-micro:11px;   /* finest metadata */
+
+  /* Line heights */
+  --lh-display: 1.1;
+  --lh-body:    1.45;
+  --lh-ui:      1.3;
+
+  /* Tracking */
+  --track-caps:      0.12em;
+  --track-caps-tight:0.08em;
+
+  /* Spacing — named, not numeric */
+  --space-hairline:  0.5px;
+  --space-tight:     4px;
+  --space-small:     8px;
+  --space-close:     12px;
+  --space-default:   16px;
+  --space-roomy:     24px;
+  --space-wide:      32px;
+  --space-section:   48px;
+  --space-chapter:   72px;
+  --space-threshold: 96px;
+
+  /* Layout */
+  --measure: 62ch;
+  --gutter-desktop: 32px;
+  --gutter-mobile:  16px;
+  --margin-desktop: 96px;
+  --margin-mobile:  20px;
+
+  /* Radius — virtually always zero */
+  --radius-0: 0;
+  --radius-input: 2px;
+  --radius-signet: 50%;
+
+  /* Motion */
+  --ease:          cubic-bezier(0.2, 0, 0, 1);
+  --dur-fast:      200ms;
+  --dur-page:      400ms;
+  --dur-reveal:    600ms;
+}
+
+/* ─────────────────────────────────────────────
+   Element defaults — a tiny reset for mocks.
+   ─────────────────────────────────────────────*/
+
+html, body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: var(--body-serif);
+  line-height: var(--lh-body);
+  font-feature-settings: "onum", "liga", "kern";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: var(--serif);
+  font-weight: 400;
+  line-height: var(--lh-display);
+  letter-spacing: -0.005em;
+  margin: 0;
+}
+
+h1 { font-size: var(--display-xxl); }
+h2 { font-size: var(--display-xl);  }
+h3 { font-size: var(--display-lg);  }
+h4 { font-size: var(--display-md);  }
+h5 { font-size: var(--display-sm);  }
+
+p {
+  margin: 0 0 1em 0;
+  max-width: var(--measure);
+}
+
+em, i { font-style: italic; }
+
+a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 0.5px solid var(--hairline-strong);
+  transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+a:hover {
+  color: var(--oxblood);
+  border-bottom-color: var(--oxblood);
+}
+
+/* UI type utility classes */
+.ui       { font-family: var(--sans); font-size: var(--ui-md); line-height: var(--lh-ui); letter-spacing: 0.005em; }
+.ui-sm    { font-family: var(--sans); font-size: var(--ui-sm); line-height: var(--lh-ui); }
+.ui-caps  { font-family: var(--sans); font-size: var(--ui-caps); line-height: var(--lh-ui);
+            text-transform: uppercase; letter-spacing: var(--track-caps); font-weight: 500; }
+.ui-micro { font-family: var(--sans); font-size: var(--ui-micro); line-height: var(--lh-ui);
+            text-transform: uppercase; letter-spacing: var(--track-caps); color: var(--ink-secondary); }
+
+.caption  { font-family: var(--sans); font-size: var(--ui-caps); color: var(--ink-secondary);
+            line-height: var(--lh-ui); }
+
+.dropcap::first-letter {
+  font-family: var(--serif);
+  font-size: 4.4em;
+  line-height: 0.85;
+  float: left;
+  padding: 0.05em 0.08em 0 0;
+  color: var(--ink);
+}
+
+/* Decorative 32px rule, centred */
+.rule {
+  width: 32px;
+  height: 0;
+  border-top: 0.5px solid var(--oxblood);
+  margin: var(--space-section) auto;
+}
+
+.hairline-t { border-top: 0.5px solid var(--hairline); }
+.hairline-b { border-bottom: 0.5px solid var(--hairline); }
+
+/* Button */
+.btn {
+  font-family: var(--sans);
+  font-size: var(--ui-caps);
+  letter-spacing: var(--track-caps);
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 14px 28px;
+  background: var(--obsidian);
+  color: var(--alabaster);
+  border: 0.5px solid var(--obsidian);
+  border-radius: 0;
+  cursor: pointer;
+  transition: opacity var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.btn:hover { background: #1a1a1c; }
+.btn:active { opacity: 0.85; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--obsidian);
+  border: 0.5px solid var(--obsidian);
+}
+.btn-ghost:hover { background: var(--obsidian); color: var(--alabaster); }
+
+/* Input */
+.input {
+  font-family: var(--sans);
+  font-size: var(--ui-md);
+  padding: 12px 14px;
+  background: transparent;
+  color: var(--ink);
+  border: 0;
+  border-bottom: 0.5px solid var(--hairline-strong);
+  border-radius: 0;
+  outline: none;
+  width: 100%;
+}
+.input:focus { border-bottom-color: var(--obsidian); }
+.input::placeholder { color: var(--ink-secondary); }
+
+</style>
+<style>
+  html,body { margin:0; background: #0E0E10; }
+  a { text-decoration: none; }
+  ::selection { background: #5A1A1F; color: #F4F0E8; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="app"></div>
+<script type="text/babel">
+/* ===== Primitives.jsx ===== */
+// Shared primitives + tokens for the landing page. All sizes follow section 6.
+const TOKENS = {
+  obsidian:  '#0E0E10',
+  alabaster: '#F4F0E8',
+  oxblood:   '#5A1A1F',
+  gold:      '#B08D57',
+  goldLight: '#C9B896',
+  stone:     '#8A7F6E',
+  white:     '#FFFFFF',
+  container: 1120,
+  pageMargin: 160,
+};
+
+function Container({ children, style }) {
+  return (
+    <div style={{ maxWidth: 1120, margin: '0 auto', padding: '0 24px', ...style }}>
+      {children}
+    </div>
+  );
+}
+
+function Eyebrow({ children, on = 'dark' }) {
+  const colour = on === 'dark' ? TOKENS.gold
+                : on === 'light' ? TOKENS.oxblood
+                : TOKENS.stone;
+  return (
+    <div style={{
+      fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 500,
+      letterSpacing: '0.3em', textTransform: 'uppercase',
+      lineHeight: '16px', color: colour,
+    }}>— {children} —</div>
+  );
+}
+
+function Divider({ on = 'dark', width = 30 }) {
+  const colour = on === 'dark' ? TOKENS.gold : TOKENS.oxblood;
+  return <div style={{ width, borderTop: `0.5px solid ${colour}`, margin: '22px 0' }}/>;
+}
+
+function PrimaryBtn({ children, href }) {
+  const style = {
+    fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 500,
+    letterSpacing: '0.28em', textTransform: 'uppercase',
+    padding: '14px 34px', background: TOKENS.gold,
+    color: TOKENS.obsidian, border: 0, borderRadius: 2, cursor: 'pointer',
+    transition: 'background 200ms cubic-bezier(0.2,0,0,1)',
+    textDecoration: 'none', display: 'inline-block',
+  };
+  const handlers = {
+    onMouseEnter: e => e.currentTarget.style.background = '#A1814F',
+    onMouseLeave: e => e.currentTarget.style.background = TOKENS.gold,
+  };
+  if (href) return <a href={href} style={style} {...handlers}>{children}</a>;
+  return <button style={style} {...handlers}>{children}</button>;
+}
+
+function SecondaryBtn({ children, on = 'dark', href }) {
+  const colour = on === 'dark' ? TOKENS.gold : TOKENS.oxblood;
+  const style = {
+    fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 500,
+    letterSpacing: '0.28em', textTransform: 'uppercase',
+    padding: '14px 34px', background: 'transparent',
+    color: colour, border: `0.5px solid ${colour}`, borderRadius: 2, cursor: 'pointer',
+    textDecoration: 'none', display: 'inline-block',
+  };
+  if (href) return <a href={href} style={style}>{children}</a>;
+  return <button style={style}>{children}</button>;
+}
+
+function Wordmark({ colour = TOKENS.obsidian, size = 11 }) {
+  return (
+    <span style={{
+      fontFamily: 'var(--serif)', fontWeight: 400,
+      letterSpacing: '0.18em', textTransform: 'uppercase',
+      fontSize: size, color: colour,
+    }}>CONSORS</span>
+  );
+}
+
+function Signet({ size = 22, ring = TOKENS.gold, letter = TOKENS.gold, bg = 'transparent' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 60 60" style={{ display:'block' }}>
+      <circle cx="30" cy="30" r="29.5" fill={bg} stroke={ring} strokeWidth="0.5"/>
+      <circle cx="30" cy="30" r="25.5" fill="none" stroke={ring} strokeWidth="0.5"/>
+      <text x="30" y="30" textAnchor="middle" dominantBaseline="central"
+            fontFamily="var(--serif)" fontSize="28" fill={letter}>C</text>
+    </svg>
+  );
+}
+
+window.TOKENS = TOKENS;
+window.Container = Container;
+window.Eyebrow = Eyebrow;
+window.Divider = Divider;
+window.PrimaryBtn = PrimaryBtn;
+window.SecondaryBtn = SecondaryBtn;
+window.Wordmark = Wordmark;
+window.Signet = Signet;
+
+
+/* ===== Tweaks.jsx ===== */
+// Edit-mode defaults. Keys are merged back to disk by the host.
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "quoteFontSize": 32,
+  "quoteLineHeight": 46,
+  "quoteMaxWidth": 720,
+  "underCtaAlign": "center"
+}/*EDITMODE-END*/;
+
+function useTweaks() {
+  const [tweaks, setTweaks] = React.useState(TWEAK_DEFAULTS);
+  const [open, setOpen] = React.useState(false);
+  const [available, setAvailable] = React.useState(false);
+
+  React.useEffect(() => {
+    function onMsg(e) {
+      const d = e.data || {};
+      if (d.type === '__activate_edit_mode')   { setOpen(true); setAvailable(true); }
+      if (d.type === '__deactivate_edit_mode') { setOpen(false); }
+    }
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  const set = React.useCallback((patch) => {
+    setTweaks(t => ({ ...t, ...patch }));
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: patch }, '*');
+  }, []);
+
+  return { tweaks, set, open, available };
+}
+
+function TweaksPanel({ tweaks, set, open }) {
+  if (!open) return null;
+  const row = { display: 'grid', gridTemplateColumns: '120px 1fr', gap: 10,
+                alignItems: 'center', padding: '8px 0',
+                borderBottom: '0.5px solid #ffffff14' };
+  const label = { fontFamily: 'var(--sans)', fontSize: 10, fontWeight: 500,
+                  letterSpacing: '0.22em', textTransform: 'uppercase',
+                  color: '#B08D57' };
+  return (
+    <div style={{
+      position: 'fixed', right: 20, bottom: 20, width: 300,
+      background: '#0E0E10', color: '#F4F0E8',
+      border: '0.5px solid #B08D5759', borderRadius: 8,
+      padding: 18, zIndex: 1000,
+      fontFamily: 'var(--sans)', fontSize: 12,
+    }}>
+      <div style={{
+        fontFamily: 'var(--serif)', fontSize: 16, letterSpacing: '0.18em',
+        textTransform: 'uppercase', color: '#F4F0E8',
+        borderBottom: '0.5px solid #B08D57', paddingBottom: 10, marginBottom: 10,
+      }}>Tweaks</div>
+
+      <div style={row}>
+        <span style={label}>Quote size</span>
+        <input type="range" min="16" max="56" value={tweaks.quoteFontSize}
+               onChange={e => set({ quoteFontSize: +e.target.value,
+                                    quoteLineHeight: Math.round(+e.target.value * 1.45) })}/>
+      </div>
+      <div style={row}>
+        <span style={label}>Quote width</span>
+        <input type="range" min="420" max="900" step="20" value={tweaks.quoteMaxWidth}
+               onChange={e => set({ quoteMaxWidth: +e.target.value })}/>
+      </div>
+      <div style={row}>
+        <span style={label}>Under-CTA</span>
+        <select value={tweaks.underCtaAlign}
+                onChange={e => set({ underCtaAlign: e.target.value })}
+                style={{
+                  background: '#1A1A1D', color: '#F4F0E8',
+                  border: '0.5px solid #B08D5759', padding: '6px 8px',
+                  fontFamily: 'var(--sans)', fontSize: 12,
+                }}>
+          <option value="center">Center</option>
+          <option value="left">Left</option>
+          <option value="right">Right</option>
+        </select>
+      </div>
+    </div>
+  );
+}
+
+window.useTweaks = useTweaks;
+window.TweaksPanel = TweaksPanel;
+
+
+/* ===== Nav.jsx ===== */
+// Persistent top navigation.
+function Nav() {
+  return (
+    <div style={{
+      position: 'sticky', top: 0, zIndex: 20,
+      background: TOKENS.obsidian, color: TOKENS.alabaster,
+      borderBottom: `0.5px solid ${TOKENS.gold}40`,
+    }}>
+      <Container style={{ display: 'flex', justifyContent: 'space-between',
+                          alignItems: 'center', padding: '20px 24px', gap: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <img
+            src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDQ0IiBoZWlnaHQ9IjQ4IiB2aWV3Qm94PSIwIDAgNDQ0IDQ4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNNDI4LjA1MiAwQzQzMi42NjcgMCA0MzcuODI1IDEuMzU5NzcgNDQyLjIzNiAzLjg3NTM1VjEzLjg2OTdINDM5LjMxOEM0MzguODQzIDcuMDcwODIgNDM0LjE2IDIuOTIzNTEgNDI3LjY0NSAyLjkyMzUxQzQyMy4wMyAyLjkyMzUxIDQxOS4yOTggNS43NzkwNCA0MTkuMjk4IDkuMzgyNDNDNDE5LjI5OCAxMi4zMDU5IDQyMC44NTggMTQuNTQ5NiA0MjkuMDcgMTkuMTA0OEM0MzkuODYxIDI1LjA4NzggNDQ0IDI4Ljk2MzIgNDQ0IDM1LjE1MDFDNDQ0IDQyLjgzMjkgNDM2LjczOSA0OCA0MjcuMDM0IDQ4QzQyMS43NDEgNDggNDE0Ljc1MSA0Ni40MzYzIDQxMS4zNTcgNDQuNzM2NVYzMy4wNDI1SDQxNC4yNzZDNDE1LjgzNiA0MC44NjEyIDQxOS45NzYgNDQuNzM2NSA0MjYuODMxIDQ0LjczNjVDNDMyLjUzMSA0NC43MzY1IDQzNy4wMSA0MS4yMDExIDQzNy4wMSAzNy4xMjE4QzQzNy4wMSAzMy43MjI0IDQzNC4wOTIgMzAuOTM0OCA0MjYuNTU5IDI2LjY1MTZDNDE1LjI5NCAyMC4yNjA2IDQxMi4zMDggMTYuOTk3MiA0MTIuMzA4IDExLjQ5MDFDNDEyLjMwOCA0LjgyNzE5IDQxOC42ODcgMCA0MjguMDUyIDBaIiBmaWxsPSJ3aGl0ZSI+PC9wYXRoPgo8cGF0aCBkPSJNMzQ0LjEyMSAwLjgxNTg1N0gzNjYuNzE5QzM3Ny4zMDYgMC44MTU4NTcgMzgzLjYxOCA1LjA5OTE1IDM4My42MTggMTIuNzgxOUMzODMuNjE4IDE4LjY5NjkgMzc4LjkzNSAyMy4xMTYxIDM3MC45OTUgMjQuNDA3OUwzNzkuNDc4IDM0LjEzMDNDMzg2LjEyOSA0MS43NDUgMzg5LjM4NiA0NC42MDA2IDM5MS45NjUgNDQuNjAwNlY0Ny4xODQxSDM4Ni42NzJDMzgyLjEyNSA0Ny4xODQxIDM4MC4xNTcgNDYuMzY4MyAzNzQuMjUyIDM5LjAyNTVMMzY0Ljg4NyAyNy4zMzE0QzM2My41OTggMjUuNzY3NyAzNjIuNzgzIDI1LjI5MTggMzU5LjA1MSAyNS4yOTE4SDM1OC4xMDFWMzguNDEzNkMzNTguMTAxIDQyLjI4ODkgMzYwLjA2OSA0NC42MDA2IDM2NS4yMjYgNDQuNjAwNlY0Ny4xODQxSDM0NC4xMjFWNDQuNjAwNkMzNDguNjY4IDQ0LjYwMDYgMzUwLjk3NSA0Mi44MzI5IDM1MC45NzUgMzcuMTIxOFY5Ljg1ODM1QzM1MC45NzUgNS43NzkwMyAzNDkuMDc1IDMuMzk5NDMgMzQ0LjEyMSAzLjM5OTQzVjAuODE1ODU3Wk0zNTguMTAxIDIyLjM2ODNIMzY0Ljc1MUMzNzEuNjA2IDIyLjM2ODMgMzc1LjQwNiAxOS4zNzY4IDM3NS40MDYgMTMuNTk3N0MzNzUuNDA2IDcuNjgyNzEgMzcwLjcyMyAzLjczOTM3IDM2My42NjYgMy43MzkzN0gzNTguMTAxVjIyLjM2ODNaIiBmaWxsPSJ3aGl0ZSI+PC9wYXRoPgo8cGF0aCBkPSJNMjk3LjA1OCAwQzMxMC42OTggMCAzMjEuMDE0IDEwLjQ3MDMgMzIxLjAxNCAyMy44NjRDMzIxLjAxNCAzOC4wMDU3IDMwOS44ODQgNDggMjk2LjE3NSA0OEMyODMuMTQ1IDQ4IDI3My4wMzQgMzguMTQxNiAyNzMuMDM0IDI1LjA4NzhDMjczLjAzNCA5LjExMDQ4IDI4NC4yMzEgMCAyOTcuMDU4IDBaTTI4MS4yNDUgMjEuMjEyNUMyODEuMjQ1IDM0Ljc0MjIgMjg4LjAzMiA0NS4wNzY1IDI5Ny42MDEgNDUuMDc2NUMzMDYuNzYyIDQ1LjA3NjUgMzEyLjgwMiAzOC4xNDE2IDMxMi44MDIgMjYuOTIzNUMzMTIuODAyIDEyLjQ0MTkgMzA1LjU0MSAyLjkyMzUxIDI5NS43NjggMi45MjM1MUMyODcuNTU3IDIuOTIzNTEgMjgxLjI0NSA5LjU4NjQgMjgxLjI0NSAyMS4yMTI1WiIgZmlsbD0id2hpdGUiPjwvcGF0aD4KPHBhdGggZD0iTTIzMi44NzUgMEMyMzcuNDkgMCAyNDIuNjQ4IDEuMzU5NzcgMjQ3LjA1OSAzLjg3NTM1VjEzLjg2OTdIMjQ0LjE0MUMyNDMuNjY2IDcuMDcwODIgMjM4Ljk4MyAyLjkyMzUxIDIzMi40NjggMi45MjM1MUMyMjcuODUzIDIuOTIzNTEgMjI0LjEyMSA1Ljc3OTA0IDIyNC4xMjEgOS4zODI0M0MyMjQuMTIxIDEyLjMwNTkgMjI1LjY4MiAxNC41NDk2IDIzMy44OTMgMTkuMTA0OEMyNDQuNjg0IDI1LjA4NzggMjQ4LjgyMyAyOC45NjMyIDI0OC44MjMgMzUuMTUwMUMyNDguODIzIDQyLjgzMjkgMjQxLjU2MiA0OCAyMzEuODU3IDQ4QzIyNi41NjQgNDggMjE5LjU3NCA0Ni40MzYzIDIxNi4xODEgNDQuNzM2NVYzMy4wNDI1SDIxOS4wOTlDMjIwLjY2IDQwLjg2MTIgMjI0Ljc5OSA0NC43MzY1IDIzMS42NTQgNDQuNzM2NUMyMzcuMzU0IDQ0LjczNjUgMjQxLjgzMyA0MS4yMDExIDI0MS44MzMgMzcuMTIxOEMyNDEuODMzIDMzLjcyMjQgMjM4LjkxNSAzMC45MzQ4IDIzMS4zODIgMjYuNjUxNkMyMjAuMTE3IDIwLjI2MDYgMjE3LjEzMSAxNi45OTcyIDIxNy4xMzEgMTEuNDkwMUMyMTcuMTMxIDQuODI3MTkgMjIzLjUxIDAgMjMyLjg3NSAwWiIgZmlsbD0id2hpdGUiPjwvcGF0aD4KPHBhdGggZD0iTTEzOC40MjUgMC44MTU4NTdIMTQ5LjQxOUwxODQuMDk4IDM2LjAzNFYxMy44MDE3QzE4NC4wOTggNy44MTg2OSAxODIuMzMzIDMuMzk5NDMgMTc2LjAyMiAzLjM5OTQzVjAuODE1ODU3SDE5NC4yNzdWMy4zOTk0M0MxODkuMzkxIDMuMzk5NDMgMTg3LjAxNiA3LjQxMDc2IDE4Ny4wMTYgMTMuNTk3N1YzNS41NTgxQzE4Ny4wMTYgNDEuMjY5MSAxODguNTc3IDQ1LjIxMjUgMTg4LjU3NyA0Ny43MjhIMTg0LjA5OEMxODAuODQgNDMuNDQ0OCAxODAuMzY1IDQyLjgzMjkgMTc4LjQ2NSA0MC45MjkyTDE1MC41NzMgMTIuMzA1OVYzNi4xN0MxNTAuNTczIDQxLjYwOTEgMTUyLjk0OCA0NC42MDA2IDE1OC44NTIgNDQuNjAwNlY0Ny4xODQxSDEzOS40NDNWNDQuNjAwNkMxNDUuODIyIDQ0LjYwMDYgMTQ3LjY1NCA0Mi4yODg5IDE0Ny42NTQgMzcuNzMzN1Y5LjE3ODQ2TDE0NC4xMjUgNS43MTEwNEMxNDIuNzY4IDQuNDE5MjYgMTQwLjg2OCAzLjYwMzM5IDEzOC40MjUgMy4zOTk0M1YwLjgxNTg1N1oiIGZpbGw9IndoaXRlIj48L3BhdGg+CjxwYXRoIGQ9Ik05My4zOTg1IDBDMTA3LjAzOSAwIDExNy4zNTUgMTAuNDcwMyAxMTcuMzU1IDIzLjg2NEMxMTcuMzU1IDM4LjAwNTcgMTA2LjIyNSA0OCA5Mi41MTYzIDQ4Qzc5LjQ4NjMgNDggNjkuMzc0NSAzOC4xNDE2IDY5LjM3NDUgMjUuMDg3OEM2OS4zNzQ1IDkuMTEwNDggODAuNTcyMSAwIDkzLjM5ODUgMFpNNzcuNTg2MSAyMS4yMTI1Qzc3LjU4NjEgMzQuNzQyMiA4NC4zNzI2IDQ1LjA3NjUgOTMuOTQxNCA0NS4wNzY1QzEwMy4xMDMgNDUuMDc2NSAxMDkuMTQzIDM4LjE0MTYgMTA5LjE0MyAyNi45MjM1QzEwOS4xNDMgMTIuNDQxOSAxMDEuODgyIDIuOTIzNTEgOTIuMTA5MSAyLjkyMzUxQzgzLjg5NzUgMi45MjM1MSA3Ny41ODYxIDkuNTg2NCA3Ny41ODYxIDIxLjIxMjVaIiBmaWxsPSJ3aGl0ZSI+PC9wYXRoPgo8cGF0aCBkPSJNMjYuNzM4NiAwQzMxLjgyODQgMCAzNy4wNTQgMS4wODc4MiA0Mi43NTQ2IDMuMTk1NDdMNDQuMzgzMyAxNC4wMDU3SDQyLjIxMTdDMzkuMDg5OSA3LjIwNjggMzIuODQ2NCAyLjkyMzUxIDI2LjEyNzggMi45MjM1MUMxNi44MzA0IDIuOTIzNTEgOC4yMTE2IDkuOTk0MzMgOC4yMTE2IDIzLjI1MjFDOC4yMTE2IDM1LjIxODEgMTUuMDY1OSA0NS4wNzY1IDI3LjA3NzkgNDUuMDc2NUMzNC45NTAyIDQ1LjA3NjUgNDAuNTgyOSA0MS4wNjUyIDQyLjIxMTcgMzMuNjU0NEg0NC43MjI3TDQ0LjM4MzMgNDQuMzI4NkMzOS43Njg2IDQ2LjIzMjMgMzEuNjI0OCA0OCAyNS45MjQyIDQ4QzEwLjk5NCA0OCAwIDM4LjU0OTYgMCAyNC44ODM5QzAgMTAuODc4MiAxMC42NTQ3IDAgMjYuNzM4NiAwWiIgZmlsbD0id2hpdGUiPjwvcGF0aD4KPC9zdmc+"
+            alt="Consors"
+            style={{ height: 12, display: 'block' }}
+          />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
+          <a href="signin.html" style={{
+            fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 500,
+            letterSpacing: '0.3em', color: TOKENS.alabaster, border: 0,
+            cursor: 'pointer',
+          }}>SIGN IN</a>
+          <a href="apply.html" style={{
+            fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 500,
+            letterSpacing: '0.28em', textTransform: 'uppercase',
+            padding: '10px 22px', background: TOKENS.gold,
+            color: TOKENS.obsidian, border: 0, borderRadius: 2,
+            cursor: 'pointer', textDecoration: 'none',
+            transition: 'background 200ms cubic-bezier(0.2,0,0,1)',
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = '#A1814F'}
+          onMouseLeave={e => e.currentTarget.style.background = TOKENS.gold}>
+            Apply for membership
+          </a>
+        </div>
+      </Container>
+    </div>
+  );
+}
+window.Nav = Nav;
+
+
+/* ===== NavMinimal.jsx ===== */
+// Dark, narrow nav used on sign-in and apply pages. Wordmark left,
+// "Return to the website" right — no CTA clutter.
+function NavMinimal() {
+  return (
+    <div style={{
+      position: 'sticky', top: 0, zIndex: 20,
+      background: TOKENS.obsidian, color: TOKENS.alabaster,
+      borderBottom: `0.5px solid ${TOKENS.gold}40`,
+    }}>
+      <Container style={{ display: 'flex', justifyContent: 'center',
+                          alignItems: 'center', padding: '20px 24px' }}>
+        <a href="index.html" style={{ display: 'flex', alignItems: 'center' }}>
+          <img
+            src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDQ0IiBoZWlnaHQ9IjQ4IiB2aWV3Qm94PSIwIDAgNDQ0IDQ4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNNDI4LjA1MiAwQzQzMi42NjcgMCA0MzcuODI1IDEuMzU5NzcgNDQyLjIzNiAzLjg3NTM1VjEzLjg2OTdINDM5LjMxOEM0MzguODQzIDcuMDcwODIgNDM0LjE2IDIuOTIzNTEgNDI3LjY0NSAyLjkyMzUxQzQyMy4wMyAyLjkyMzUxIDQxOS4yOTggNS43NzkwNCA0MTkuMjk4IDkuMzgyNDNDNDE5LjI5OCAxMi4zMDU5IDQyMC44NTggMTQuNTQ5NiA0MjkuMDcgMTkuMTA0OEM0MzkuODYxIDI1LjA4NzggNDQ0IDI4Ljk2MzIgNDQ0IDM1LjE1MDFDNDQ0IDQyLjgzMjkgNDM2LjczOSA0OCA0MjcuMDM0IDQ4QzQyMS43NDEgNDggNDE0Ljc1MSA0Ni40MzYzIDQxMS4zNTcgNDQuNzM2NVYzMy4wNDI1SDQxNC4yNzZDNDE1LjgzNiA0MC44NjEyIDQxOS45NzYgNDQuNzM2NSA0MjYuODMxIDQ0LjczNjVDNDMyLjUzMSA0NC43MzY1IDQzNy4wMSA0MS4yMDExIDQzNy4wMSAzNy4xMjE4QzQzNy4wMSAzMy43MjI0IDQzNC4wOTIgMzAuOTM0OCA0MjYuNTU5IDI2LjY1MTZDNDE1LjI5NCAyMC4yNjA2IDQxMi4zMDggMTYuOTk3MiA0MTIuMzA4IDExLjQ5MDFDNDEyLjMwOCA0LjgyNzE5IDQxOC42ODcgMCA0MjguMDUyIDBaIiBmaWxsPSJ3aGl0ZSI+PC9wYXRoPgo8cGF0aCBkPSJNMzQ0LjEyMSAwLjgxNTg1N0gzNjYuNzE5QzM3Ny4zMDYgMC44MTU4NTcgMzgzLjYxOCA1LjA5OTE1IDM4My42MTggMTIuNzgxOUMzODMuNjE4IDE4LjY5NjkgMzc4LjkzNSAyMy4xMTYxIDM3MC45OTUgMjQuNDA3OUwzNzkuNDc4IDM0LjEzMDNDMzg2LjEyOSA0MS43NDUgMzg5LjM4NiA0NC42MDA2IDM5MS45NjUgNDQuNjAwNlY0Ny4xODQxSDM4Ni42NzJDMzgyLjEyNSA0Ny4xODQxIDM4MC4xNTcgNDYuMzY4MyAzNzQuMjUyIDM5LjAyNTVMMzY0Ljg4NyAyNy4zMzE0QzM2My41OTggMjUuNzY3NyAzNjIuNzgzIDI1LjI5MTggMzU5LjA1MSAyNS4yOTE4SDM1OC4xMDFWMzguNDEzNkMzNTguMTAxIDQyLjI4ODkgMzYwLjA2OSA0NC42MDA2IDM2NS4yMjYgNDQuNjAwNlY0Ny4xODQxSDM0NC4xMjFWNDQuNjAwNkMzNDguNjY4IDQ0LjYwMDYgMzUwLjk3NSA0Mi44MzI5IDM1MC45NzUgMzcuMTIxOFY5Ljg1ODM1QzM1MC45NzUgNS43NzkwMyAzNDkuMDc1IDMuMzk5NDMgMzQ0LjEyMSAzLjM5OTQzVjAuODE1ODU3Wk0zNTguMTAxIDIyLjM2ODNIMzY0Ljc1MUMzNzEuNjA2IDIyLjM2ODMgMzc1LjQwNiAxOS4zNzY4IDM3NS40MDYgMTMuNTk3N0MzNzUuNDA2IDcuNjgyNzEgMzcwLjcyMyAzLjczOTM3IDM2My42NjYgMy43MzkzN0gzNTguMTAxVjIyLjM2ODNaIiBmaWxsPSJ3aGl0ZSI+PC9wYXRoPgo8cGF0aCBkPSJNMjk3LjA1OCAwQzMxMC42OTggMCAzMjEuMDE0IDEwLjQ3MDMgMzIxLjAxNCAyMy44NjRDMzIxLjAxNCAzOC4wMDU3IDMwOS44ODQgNDggMjk2LjE3NSA0OEMyODMuMTQ1IDQ4IDI3My4wMzQgMzguMTQxNiAyNzMuMDM0IDI1LjA4NzhDMjczLjAzNCA5LjExMDQ4IDI4NC4yMzEgMCAyOTcuMDU4IDBaTTI4MS4yNDUgMjEuMjEyNUMyODEuMjQ1IDM0Ljc0MjIgMjg4LjAzMiA0NS4wNzY1IDI5Ny42MDEgNDUuMDc2NUMzMDYuNzYyIDQ1LjA3NjUgMzEyLjgwMiAzOC4xNDE2IDMxMi44MDIgMjYuOTIzNUMzMTIuODAyIDEyLjQ0MTkgMzA1LjU0MSAyLjkyMzUxIDI5NS43NjggMi45MjM1MUMyODcuNTU3IDIuOTIzNTEgMjgxLjI0NSA5LjU4NjQgMjgxLjI0NSAyMS4yMTI1WiIgZmlsbD0id2hpdGUiPjwvcGF0aD4KPHBhdGggZD0iTTIzMi44NzUgMEMyMzcuNDkgMCAyNDIuNjQ4IDEuMzU5NzcgMjQ3LjA1OSAzLjg3NTM1VjEzLjg2OTdIMjQ0LjE0MUMyNDMuNjY2IDcuMDcwODIgMjM4Ljk4MyAyLjkyMzUxIDIzMi40NjggMi45MjM1MUMyMjcuODUzIDIuOTIzNTEgMjI0LjEyMSA1Ljc3OTA0IDIyNC4xMjEgOS4zODI0M0MyMjQuMTIxIDEyLjMwNTkgMjI1LjY4MiAxNC41NDk2IDIzMy44OTMgMTkuMTA0OEMyNDQuNjg0IDI1LjA4NzggMjQ4LjgyMyAyOC45NjMyIDI0OC44MjMgMzUuMTUwMUMyNDguODIzIDQyLjgzMjkgMjQxLjU2MiA0OCAyMzEuODU3IDQ4QzIyNi41NjQgNDggMjE5LjU3NCA0Ni40MzYzIDIxNi4xODEgNDQuNzM2NVYzMy4wNDI1SDIxOS4wOTlDMjIwLjY2IDQwLjg2MTIgMjI0Ljc5OSA0NC43MzY1IDIzMS42NTQgNDQuNzM2NUMyMzcuMzU0IDQ0LjczNjUgMjQxLjgzMyA0MS4yMDExIDI0MS44MzMgMzcuMTIxOEMyNDEuODMzIDMzLjcyMjQgMjM4LjkxNSAzMC45MzQ4IDIzMS4zODIgMjYuNjUxNkMyMjAuMTE3IDIwLjI2MDYgMjE3LjEzMSAxNi45OTcyIDIxNy4xMzEgMTEuNDkwMUMyMTcuMTMxIDQuODI3MTkgMjIzLjUxIDAgMjMyLjg3NSAwWiIgZmlsbD0id2hpdGUiPjwvcGF0aD4KPHBhdGggZD0iTTEzOC40MjUgMC44MTU4NTdIMTQ5LjQxOUwxODQuMDk4IDM2LjAzNFYxMy44MDE3QzE4NC4wOTggNy44MTg2OSAxODIuMzMzIDMuMzk5NDMgMTc2LjAyMiAzLjM5OTQzVjAuODE1ODU3SDE5NC4yNzdWMy4zOTk0M0MxODkuMzkxIDMuMzk5NDMgMTg3LjAxNiA3LjQxMDc2IDE4Ny4wMTYgMTMuNTk3N1YzNS41NTgxQzE4Ny4wMTYgNDEuMjY5MSAxODguNTc3IDQ1LjIxMjUgMTg4LjU3NyA0Ny43MjhIMTg0LjA5OEMxODAuODQgNDMuNDQ0OCAxODAuMzY1IDQyLjgzMjkgMTc4LjQ2NSA0MC45MjkyTDE1MC41NzMgMTIuMzA1OVYzNi4xN0MxNTAuNTczIDQxLjYwOTEgMTUyLjk0OCA0NC42MDA2IDE1OC44NTIgNDQuNjAwNlY0Ny4xODQxSDEzOS40NDNWNDQuNjAwNkMxNDUuODIyIDQ0LjYwMDYgMTQ3LjY1NCA0Mi4yODg5IDE0Ny42NTQgMzcuNzMzN1Y5LjE3ODQ2TDE0NC4xMjUgNS43MTEwNEMxNDIuNzY4IDQuNDE5MjYgMTQwLjg2OCAzLjYwMzM5IDEzOC40MjUgMy4zOTk0M1YwLjgxNTg1N1oiIGZpbGw9IndoaXRlIj48L3BhdGg+CjxwYXRoIGQ9Ik05My4zOTg1IDBDMTA3LjAzOSAwIDExNy4zNTUgMTAuNDcwMyAxMTcuMzU1IDIzLjg2NEMxMTcuMzU1IDM4LjAwNTcgMTA2LjIyNSA0OCA5Mi41MTYzIDQ4Qzc5LjQ4NjMgNDggNjkuMzc0NSAzOC4xNDE2IDY5LjM3NDUgMjUuMDg3OEM2OS4zNzQ1IDkuMTEwNDggODAuNTcyMSAwIDkzLjM5ODUgMFpNNzcuNTg2MSAyMS4yMTI1Qzc3LjU4NjEgMzQuNzQyMiA4NC4zNzI2IDQ1LjA3NjUgOTMuOTQxNCA0NS4wNzY1QzEwMy4xMDMgNDUuMDc2NSAxMDkuMTQzIDM4LjE0MTYgMTA5LjE0MyAyNi45MjM1QzEwOS4xNDMgMTIuNDQxOSAxMDEuODgyIDIuOTIzNTEgOTIuMTA5MSAyLjkyMzUxQzgzLjg5NzUgMi45MjM1MSA3Ny41ODYxIDkuNTg2NCA3Ny41ODYxIDIxLjIxMjVaIiBmaWxsPSJ3aGl0ZSI+PC9wYXRoPgo8cGF0aCBkPSJNMjYuNzM4NiAwQzMxLjgyODQgMCAzNy4wNTQgMS4wODc4MiA0Mi43NTQ2IDMuMTk1NDdMNDQuMzgzMyAxNC4wMDU3SDQyLjIxMTdDMzkuMDg5OSA3LjIwNjggMzIuODQ2NCAyLjkyMzUxIDI2LjEyNzggMi45MjM1MUMxNi44MzA0IDIuOTIzNTEgOC4yMTE2IDkuOTk0MzMgOC4yMTE2IDIzLjI1MjFDOC4yMTE2IDM1LjIxODEgMTUuMDY1OSA0NS4wNzY1IDI3LjA3NzkgNDUuMDc2NUMzNC45NTAyIDQ1LjA3NjUgNDAuNTgyOSA0MS4wNjUyIDQyLjIxMTcgMzMuNjU0NEg0NC43MjI3TDQ0LjM4MzMgNDQuMzI4NkMzOS43Njg2IDQ2LjIzMjMgMzEuNjI0OCA0OCAyNS45MjQyIDQ4QzEwLjk5NCA0OCAwIDM4LjU0OTYgMCAyNC44ODM5QzAgMTAuODc4MiAxMC42NTQ3IDAgMjYuNzM4NiAwWiIgZmlsbD0id2hpdGUiPjwvcGF0aD4KPC9zdmc+"
+            alt="Consors"
+            style={{ height: 12, display: 'block' }}
+          />
+        </a>
+      </Container>
+    </div>
+  );
+}
+window.NavMinimal = NavMinimal;
+
+
+/* ===== Form.jsx ===== */
+// Shared form controls for sign-in and apply pages. Dark surfaces only.
+// All fields follow the spec's restraint: no filled backgrounds, hairline
+// bottom rule, 0.5px Gold border on focus, uppercase label above.
+
+function Field({
+  label, type = 'text', name, required, value, onChange,
+  placeholder, autoComplete, as = 'input', rows = 4,
+}) {
+  const [focus, setFocus] = React.useState(false);
+  const sharedLabelStyle = {
+    display: 'block',
+    fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 500,
+    letterSpacing: '0.3em', textTransform: 'uppercase',
+    color: TOKENS.stone, marginBottom: 10,
+  };
+  const sharedInputStyle = {
+    width: '100%', background: 'transparent',
+    border: 0, borderBottom: `0.5px solid ${focus ? TOKENS.gold : TOKENS.gold + '59'}`,
+    color: TOKENS.alabaster,
+    fontFamily: 'var(--sans)', fontSize: 15, lineHeight: '27px',
+    padding: '8px 0', outline: 'none', borderRadius: 0,
+    transition: 'border-color 200ms',
+    fontStyle: 'inherit', resize: 'none',
+  };
+  return (
+    <label style={{ display: 'block', marginBottom: 28 }}>
+      <span style={sharedLabelStyle}>{label}{required && <span style={{color: TOKENS.gold}}> ·</span>}</span>
+      {as === 'textarea' ? (
+        <textarea name={name} rows={rows} value={value} onChange={onChange}
+                  placeholder={placeholder} autoComplete={autoComplete}
+                  onFocus={() => setFocus(true)} onBlur={() => setFocus(false)}
+                  style={sharedInputStyle}/>
+      ) : (
+        <input type={type} name={name} value={value} onChange={onChange}
+               placeholder={placeholder} autoComplete={autoComplete}
+               onFocus={() => setFocus(true)} onBlur={() => setFocus(false)}
+               style={sharedInputStyle}/>
+      )}
+    </label>
+  );
+}
+
+function Fieldset({ title, children }) {
+  return (
+    <fieldset style={{
+      border: 0, padding: 0, margin: '0 0 72px',
+    }}>
+      <legend style={{
+        fontFamily: 'var(--serif)', fontWeight: 400, fontSize: 22,
+        lineHeight: '27px', color: TOKENS.alabaster,
+        padding: 0, marginBottom: 8,
+      }}>{title}</legend>
+      <div style={{ width: 24, borderTop: `0.5px solid ${TOKENS.gold}`,
+                    marginBottom: 40 }}/>
+      {children}
+    </fieldset>
+  );
+}
+
+// Segmented-style single-select rendered as two hairline-framed pills.
+function ChoicePills({ label, options, value, onChange }) {
+  return (
+    <div style={{ marginBottom: 28 }}>
+      <span style={{
+        display: 'block',
+        fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 500,
+        letterSpacing: '0.3em', textTransform: 'uppercase',
+        color: TOKENS.stone, marginBottom: 14,
+      }}>{label}</span>
+      <div style={{ display: 'flex', gap: 0 }}>
+        {options.map((o, i) => {
+          const selected = o.value === value;
+          return (
+            <button type="button" key={o.value}
+                    onClick={() => onChange(o.value)}
+                    style={{
+                      flex: 1,
+                      padding: '14px 22px',
+                      background: selected ? TOKENS.gold : 'transparent',
+                      color: selected ? TOKENS.obsidian : TOKENS.alabaster,
+                      border: `0.5px solid ${TOKENS.gold}${selected ? '' : '59'}`,
+                      borderLeft: i === 0 ? `0.5px solid ${TOKENS.gold}${selected ? '' : '59'}` : 0,
+                      borderRadius: 0,
+                      fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 500,
+                      letterSpacing: '0.28em', textTransform: 'uppercase',
+                      cursor: 'pointer',
+                      transition: 'all 180ms cubic-bezier(0.2,0,0,1)',
+                    }}>
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// Telephone field with a dropdown of country dialling codes.
+// A very short list — the full brand palette of cities covers these nicely.
+const DIAL_CODES = [
+  ['+44', 'United Kingdom'],
+  ['+353','Ireland'],
+  ['+33', 'France'],
+  ['+49', 'Germany'],
+  ['+34', 'Spain'],
+  ['+39', 'Italy'],
+  ['+41', 'Switzerland'],
+  ['+31', 'Netherlands'],
+  ['+46', 'Sweden'],
+  ['+47', 'Norway'],
+  ['+45', 'Denmark'],
+  ['+351','Portugal'],
+  ['+43', 'Austria'],
+  ['+32', 'Belgium'],
+  ['+352','Luxembourg'],
+  ['+377','Monaco'],
+  ['+1',  'United States / Canada'],
+  ['+971','United Arab Emirates'],
+  ['+974','Qatar'],
+  ['+966','Saudi Arabia'],
+  ['+852','Hong Kong'],
+  ['+65', 'Singapore'],
+  ['+81', 'Japan'],
+  ['+852','Hong Kong'],
+  ['+61', 'Australia'],
+];
+
+function TelField({ code, onCodeChange, number, onNumberChange, required }) {
+  const [focus, setFocus] = React.useState(false);
+  const border = `0.5px solid ${focus ? TOKENS.gold : TOKENS.gold + '59'}`;
+  const sharedText = {
+    background: 'transparent', border: 0, color: TOKENS.alabaster,
+    fontFamily: 'var(--sans)', fontSize: 15, lineHeight: '27px',
+    padding: '8px 0', outline: 'none', borderRadius: 0,
+  };
+  return (
+    <label style={{ display: 'block', marginBottom: 28 }}>
+      <span style={{
+        display: 'block',
+        fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 500,
+        letterSpacing: '0.3em', textTransform: 'uppercase',
+        color: TOKENS.stone, marginBottom: 10,
+      }}>Mobile {required && <span style={{color: TOKENS.gold}}> ·</span>}</span>
+      <div style={{
+        display: 'grid', gridTemplateColumns: '130px 1fr',
+        gap: 16, borderBottom: border,
+        transition: 'border-color 200ms',
+      }}>
+        <select value={code} onChange={e => onCodeChange(e.target.value)}
+                style={{
+                  ...sharedText,
+                  appearance: 'none', WebkitAppearance: 'none',
+                  paddingRight: 18,
+                  backgroundImage:
+                    `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6'%3E%3Cpath d='M1 1l3 3 3-3' stroke='%23B08D57' stroke-width='0.75' fill='none'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 2px center',
+                }}>
+          {DIAL_CODES.map(([c, n], i) => (
+            <option key={i} value={c} style={{ background: TOKENS.obsidian, color: TOKENS.alabaster }}>
+              {c} · {n}
+            </option>
+          ))}
+        </select>
+        <input type="tel" autoComplete="tel-national"
+               value={number} onChange={e => onNumberChange(e.target.value)}
+               onFocus={() => setFocus(true)} onBlur={() => setFocus(false)}
+               placeholder="7700 900000"
+               style={{ ...sharedText, width: '100%' }}/>
+      </div>
+    </label>
+  );
+}
+
+window.Field = Field;
+window.Fieldset = Fieldset;
+window.ChoicePills = ChoicePills;
+window.TelField = TelField;
+
+
+/* ===== SectionHero.jsx ===== */
+function SectionHero({ underCtaAlign = 'center' }) {
+  return (
+    <section style={{
+      background: TOKENS.obsidian, color: TOKENS.alabaster,
+      padding: '128px 0',
+    }}>
+      <Container style={{ textAlign: 'center' }}>
+        <Eyebrow on="dark">EST. MMXXVI · BY INVITATION</Eyebrow>
+        <h1 style={{
+          fontFamily: 'var(--serif)', fontWeight: 400,
+          fontSize: 46, lineHeight: '51px', letterSpacing: '-0.01em',
+          margin: '40px auto 22px', maxWidth: 620,
+        }}>
+          Where distinguished men find private companionship
+        </h1>
+        <p style={{
+          fontFamily: 'var(--serif)', fontStyle: 'italic',
+          fontSize: 22, lineHeight: '33px', color: TOKENS.goldLight,
+          margin: '0 auto 40px', maxWidth: 620,
+        }}>
+          We curate private experiences between you and the company you most
+          desire — wherever you are in the world.
+        </p>
+        <PrimaryBtn href="apply.html">Apply for membership</PrimaryBtn>
+        <p style={{
+          fontFamily: 'var(--sans)', fontSize: 13, color: TOKENS.stone,
+          margin: '22px auto 0', letterSpacing: '0.02em',
+          textAlign: underCtaAlign, maxWidth: 460,
+        }}>Membership terms discussed privately, upon application.</p>
+      </Container>
+    </section>
+  );
+}
+window.SectionHero = SectionHero;
+
+
+/* ===== SectionPhilosophy.jsx ===== */
+function SectionPhilosophy() {
+  return (
+    <section style={{ background: TOKENS.alabaster, color: TOKENS.obsidian,
+                      padding: '128px 0' }}>
+      <Container style={{ textAlign: 'center', maxWidth: 720 }}>
+        <Eyebrow on="light">A QUICK INTRODUCTION</Eyebrow>
+        <p style={{
+          fontFamily: 'var(--serif)', fontStyle: 'italic',
+          fontSize: 22, lineHeight: '33px',
+          margin: '40px auto 22px', maxWidth: 620,
+        }}>
+          The Romans had a word for one’s chosen companion — <em style={{fontStyle:'normal'}}>consors</em> —
+          the partner with whom one shares an evening, a table, a trip, a room.
+          Two thousand years later, we have borrowed it for the same reason.
+        </p>
+        <div style={{ width: 30, borderTop: `0.5px solid ${TOKENS.oxblood}`, margin: '40px auto' }}/>
+        <p style={{
+          fontFamily: 'var(--sans)', fontSize: 14, lineHeight: '25px',
+          margin: '0 auto', maxWidth: 540,
+        }}>
+          Consors is a private adult lifestyle and concierge service for
+          gentlemen who know what they want, but not how to make it happen.
+          We inspire. We curate. We make introductions. We verify, quietly,
+          who walks through our door — so that whatever follows, a dinner
+          in the city, a weekend in the countryside, an intimate rendezvous,
+          is arranged with absolute confidence.
+        </p>
+      </Container>
+    </section>
+  );
+}
+window.SectionPhilosophy = SectionPhilosophy;
+
+
+/* ===== SectionCredential.jsx ===== */
+// The verified credential member card.
+function MemberCard() {
+  return (
+    <div style={{
+      width: 360, aspectRatio: '1.586 / 1',
+      background: TOKENS.obsidian, borderRadius: 8,
+      border: `0.5px solid ${TOKENS.gold}59`, /* 35% alpha */
+      padding: '16px 20px',
+      display: 'grid', gridTemplateRows: 'auto 1fr auto',
+      color: TOKENS.alabaster,
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between',
+                    alignItems: 'flex-start' }}>
+        <div>
+          <div style={{
+            fontFamily: 'var(--serif)', fontSize: 14,
+            letterSpacing: '0.2em', color: TOKENS.alabaster,
+          }}>CONSORS</div>
+          <div style={{ width: 20, borderTop: `0.5px solid ${TOKENS.gold}`,
+                        marginTop: 6 }}/>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <svg width="11" height="11" viewBox="0 0 16 16">
+            <path d="M3.5 8.2 L6.5 11 L12.5 4.5" stroke={TOKENS.gold}
+                  strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+          </svg>
+          <span style={{
+            fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 500,
+            letterSpacing: '0.2em', color: TOKENS.gold,
+          }}>VERIFIED</span>
+        </div>
+      </div>
+      <div style={{ alignSelf: 'center' }}>
+        <div style={{
+          fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 500,
+          letterSpacing: '0.3em', textTransform: 'uppercase',
+          color: TOKENS.stone, marginBottom: 8,
+        }}>Member</div>
+        <div style={{ fontFamily: 'var(--serif)', fontSize: 22,
+                      lineHeight: 1.1, color: TOKENS.alabaster }}>
+          Henry Ashworth
+        </div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between',
+                    alignItems: 'flex-end' }}>
+        <div>
+          <div style={{
+            fontFamily: 'var(--sans)', fontSize: 11, color: TOKENS.stone,
+            letterSpacing: '0.22em', textTransform: 'uppercase',
+          }}>N° MMMCXLII · MMXXVI</div>
+        </div>
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQ0IiBoZWlnaHQ9IjE0NCIgdmlld0JveD0iMCAwIDE0NCAxNDQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xNDEgNzJDMTQxIDMzLjg5MjQgMTEwLjEwOCAzIDcyIDNDMzMuODkyNCAzIDMgMzMuODkyNCAzIDcyQzMgMTEwLjEwOCAzMy44OTI0IDE0MSA3MiAxNDFWMTQ0QzMyLjIzNTUgMTQ0IDAgMTExLjc2NSAwIDcyQzAgMzIuMjM1NSAzMi4yMzU1IDAgNzIgMEMxMTEuNzY1IDAgMTQ0IDMyLjIzNTUgMTQ0IDcyQzE0NCAxMTEuNzY1IDExMS43NjUgMTQ0IDcyIDE0NFYxNDFDMTEwLjEwOCAxNDEgMTQxIDExMC4xMDggMTQxIDcyWiIgZmlsbD0iI0I4OEM0RCI+PC9wYXRoPgo8cGF0aCBkPSJNMTMxIDcyQzEzMSAzOS40MTUyIDEwNC41ODUgMTMgNzIgMTNDMzkuNDE1MiAxMyAxMyAzOS40MTUyIDEzIDcyQzEzIDEwNC41ODUgMzkuNDE1MiAxMzEgNzIgMTMxVjEzNEMzNy43NTgzIDEzNCAxMCAxMDYuMjQyIDEwIDcyQzEwIDM3Ljc1ODMgMzcuNzU4MyAxMCA3MiAxMEMxMDYuMjQyIDEwIDEzNCAzNy43NTgzIDEzNCA3MkMxMzQgMTA2LjI0MiAxMDYuMjQyIDEzNCA3MiAxMzRWMTMxQzEwNC41ODUgMTMxIDEzMSAxMDQuNTg1IDEzMSA3MloiIGZpbGw9IiNCODhDNEQiPjwvcGF0aD4KPHBhdGggZD0iTTc0LjczODYgNDhDNzkuODI4NCA0OCA4NS4wNTQgNDkuMDg3OCA5MC43NTQ2IDUxLjE5NTVMOTIuMzgzMyA2Mi4wMDU3SDkwLjIxMTdDODcuMDg5OSA1NS4yMDY4IDgwLjg0NjQgNTAuOTIzNSA3NC4xMjc4IDUwLjkyMzVDNjQuODMwNCA1MC45MjM1IDU2LjIxMTYgNTcuOTk0MyA1Ni4yMTE2IDcxLjI1MjFDNTYuMjExNiA4My4yMTgxIDYzLjA2NTkgOTMuMDc2NSA3NS4wNzc5IDkzLjA3NjVDODIuOTUwMiA5My4wNzY1IDg4LjU4MjkgODkuMDY1MiA5MC4yMTE3IDgxLjY1NDRIOTIuNzIyN0w5Mi4zODMzIDkyLjMyODZDODcuNzY4NiA5NC4yMzIzIDc5LjYyNDggOTYgNzMuOTI0MiA5NkM1OC45OTQgOTYgNDggODYuNTQ5NiA0OCA3Mi44ODM5QzQ4IDU4Ljg3ODIgNTguNjU0NyA0OCA3NC43Mzg2IDQ4WiIgZmlsbD0iI0I4OEM0RCI+PC9wYXRoPgo8L3N2Zz4=" alt=""
+             width="24" height="24" style={{ display: 'block' }}/>
+      </div>
+    </div>
+  );
+}
+
+function SectionCredential() {
+  const steps = [
+    ['I',   'Apply',            'A brief application, reviewed within seven days.'],
+    ['II',  'The conversation', 'A private call to understand your desires, and tailor your membership to suit.'],
+    ['III', 'Verification',     'Identity confirmed privately, via a trusted third party.'],
+    ['IV',  'The card',         'Your digital credential, issued and carried at will.'],
+  ];
+  return (
+    <section style={{ background: TOKENS.obsidian, color: TOKENS.alabaster,
+                      padding: '128px 0' }}>
+      <Container>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr',
+                      gap: 72, alignItems: 'center' }}>
+          <div>
+            <Eyebrow on="dark">THE CREDENTIAL</Eyebrow>
+            <h2 style={{
+              fontFamily: 'var(--serif)', fontWeight: 400,
+              fontSize: 32, lineHeight: '38px',
+              margin: '22px 0 22px', maxWidth: 420,
+            }}>
+              A verified identity, privately held
+            </h2>
+            <p style={{
+              fontFamily: 'var(--sans)', fontSize: 15, lineHeight: '27px',
+              color: TOKENS.alabaster, maxWidth: 480, margin: 0,
+            }}>
+              Every member carries an independently verified digital credential —
+              confirmed once, held privately, shared only at your initiation. For
+              companions, it is the end of first-meeting uncertainty. For the
+              circle, it is the standard we keep.
+            </p>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <MemberCard/>
+          </div>
+        </div>
+
+        <div style={{ marginTop: 128 }}>
+          <div style={{ textAlign: 'center' }}>
+            <Eyebrow on="dark">OUR APPLICATION PROCESS</Eyebrow>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+                        marginTop: 72 }}>
+            {steps.map(([n, t, d], i) => (
+              <div key={n} style={{
+                padding: '0 28px',
+                borderLeft: i === 0 ? 0 : `0.5px solid ${TOKENS.gold}2E`,
+              }}>
+                <div style={{
+                  fontFamily: 'var(--serif)', fontStyle: 'italic',
+                  fontSize: 22, color: TOKENS.gold,
+                }}>No. {n}.</div>
+                <h3 style={{
+                  fontFamily: 'var(--serif)', fontWeight: 400,
+                  fontSize: 22, lineHeight: '27px', margin: '14px 0 22px',
+                }}>{t}</h3>
+                <p style={{
+                  fontFamily: 'var(--sans)', fontSize: 14, lineHeight: '25px',
+                  color: TOKENS.alabaster, margin: 0,
+                }}>{d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Container>
+    </section>
+  );
+}
+window.MemberCard = MemberCard;
+window.SectionCredential = SectionCredential;
+
+
+/* ===== SectionMembership.jsx ===== */
+function SectionMembership() {
+  const pillars = [
+    ['I',   'The Content',
+      'A luxury adult lifestyle publication for distinguished gentlemen. Exclusive interviews with companions, considered portraiture, inspiration, and adult lifestyle features.'],
+    ['II',  'The Companions',
+      'A curated selection of the world’s finest companions. There’s someone for everyone and every occasion. Personal introductions upon request.'],
+    ['III', 'The Concierge',
+      'Looking for something specific? Our concierge team will help you realise any experience you desire.'],
+  ];
+  return (
+    <section style={{ background: TOKENS.white, color: TOKENS.obsidian,
+                      padding: '128px 0' }}>
+      <Container>
+        <div style={{ textAlign: 'center' }}>
+          <Eyebrow on="white">YOUR MEMBERSHIP</Eyebrow>
+          <p style={{
+            fontFamily: 'var(--serif)', fontStyle: 'italic',
+            fontSize: 22, lineHeight: '33px',
+            margin: '40px auto 0', maxWidth: 620,
+          }}>
+            Everything we do is in service of one thing — sourcing and curating
+            private experiences, between you and the company you desire.
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
+                      gap: 72, marginTop: 72 }}>
+          {pillars.map(([n, t, d]) => (
+            <div key={n}>
+              <div style={{
+                fontFamily: 'var(--serif)', fontStyle: 'italic',
+                fontSize: 22, color: TOKENS.gold,
+              }}>No. {n}.</div>
+              <h3 style={{
+                fontFamily: 'var(--serif)', fontWeight: 400,
+                fontSize: 22, lineHeight: '27px', margin: '14px 0 0',
+              }}>{t}</h3>
+              <div style={{ width: 24, borderTop: `0.5px solid ${TOKENS.oxblood}`,
+                            margin: '22px 0' }}/>
+              <p style={{
+                fontFamily: 'var(--sans)', fontSize: 14, lineHeight: '25px',
+                margin: 0,
+              }}>{d}</p>
+            </div>
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}
+window.SectionMembership = SectionMembership;
+
+
+/* ===== SectionPullQuote.jsx ===== */
+function SectionPullQuote({ fontSize = 32, lineHeight = 46, maxWidth = 720 }) {
+  return (
+    <section style={{ background: TOKENS.oxblood, color: TOKENS.alabaster,
+                      padding: '128px 0' }}>
+      <Container style={{ textAlign: 'center', maxWidth: 880 }}>
+        <div style={{
+          fontFamily: 'var(--serif)', fontSize: Math.round(fontSize * 3), lineHeight: 1,
+          color: TOKENS.gold, marginBottom: 14,
+        }}>&ldquo;</div>
+        <blockquote style={{
+          fontFamily: 'var(--serif)', fontStyle: 'italic',
+          fontSize, lineHeight: `${lineHeight}px`,
+          margin: 0, color: TOKENS.alabaster,
+          maxWidth, marginLeft: 'auto', marginRight: 'auto',
+        }}>
+          One does not find good company the way one finds a restaurant.
+          Introduction matters. So does trust. So does taste. So does discretion.
+          Consors has all the aforementioned in abundance.
+        </blockquote>
+        <div style={{ width: 30, borderTop: `0.5px solid ${TOKENS.gold}`,
+                      margin: '32px auto' }}/>
+        <div style={{
+          fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 500,
+          letterSpacing: '0.3em', textTransform: 'uppercase',
+          color: TOKENS.goldLight,
+        }}>Member N° MLXXXVII</div>
+      </Container>
+    </section>
+  );
+}
+window.SectionPullQuote = SectionPullQuote;
+
+
+/* ===== SectionAgencies.jsx ===== */
+function SectionAgencies() {
+  return (
+    <section style={{ background: TOKENS.obsidian, color: TOKENS.alabaster,
+                      padding: '128px 0' }}>
+      <Container>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr',
+                      gap: 72, alignItems: 'start' }}>
+          <div>
+            <Eyebrow on="dark">PARTNER WITH US</Eyebrow>
+            <h2 style={{
+              fontFamily: 'var(--serif)', fontWeight: 400,
+              fontSize: 32, lineHeight: '38px',
+              margin: '22px 0 0', maxWidth: 420,
+            }}>
+              For agencies and representatives
+            </h2>
+          </div>
+          <div style={{
+            background: '#1A1A1D', borderRadius: 8,
+            border: `0.5px solid ${TOKENS.gold}33`,
+            padding: 32,
+          }}>
+            <p style={{
+              fontFamily: 'var(--sans)', fontSize: 14, lineHeight: '25px',
+              margin: '0 0 22px', color: TOKENS.alabaster,
+            }}>
+              Consors is a private publication with a concierge wing — not a
+              booking platform. We vet clientele. You represent companions. We
+              take no commission, no markup, and no claim on the relationships
+              you have built.
+            </p>
+            <p style={{
+              fontFamily: 'var(--sans)', fontSize: 14, lineHeight: '25px',
+              margin: '0 0 22px', color: TOKENS.alabaster,
+            }}>
+              What we offer, in return, is a quieter door — and a better calibre
+              of guest. Every Consors member is identity-verified, references
+              considered, and held to an editorial standard before any
+              introduction is made.
+            </p>
+            <p style={{
+              fontFamily: 'var(--sans)', fontSize: 14, lineHeight: '25px',
+              margin: 0, color: TOKENS.alabaster,
+            }}>
+              We partner with a considered number of agencies, managers and
+              independent representatives worldwide.
+            </p>
+            <div style={{
+              marginTop: 40, paddingTop: 22,
+              borderTop: `0.5px solid ${TOKENS.gold}33`,
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            }}>
+              <span style={{
+                fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 500,
+                letterSpacing: '0.22em', textTransform: 'uppercase',
+                color: TOKENS.stone,
+              }}>Partnership enquiries</span>
+              <SecondaryBtn on="dark">Partner with us</SecondaryBtn>
+            </div>
+          </div>
+        </div>
+      </Container>
+    </section>
+  );
+}
+window.SectionAgencies = SectionAgencies;
+
+
+/* ===== SectionWhereWeMeet.jsx ===== */
+function SectionWhereWeMeet() {
+  const places = 'London · Manchester · Dublin · Edinburgh · Glasgow · Dubai · Las Vegas';
+  return (
+    <section style={{ background: TOKENS.alabaster, color: TOKENS.obsidian,
+                      padding: '128px 0' }}>
+      <Container style={{ textAlign: 'center', maxWidth: 720 }}>
+        <Eyebrow on="light">WE'RE EVERYWHERE YOU ARE</Eyebrow>
+        <p style={{
+          fontFamily: 'var(--serif)', fontStyle: 'italic',
+          fontSize: 22, lineHeight: '33px',
+          margin: '40px auto 22px', maxWidth: 620,
+        }}>{places}</p>
+        <div style={{ width: 30, borderTop: `0.5px solid ${TOKENS.oxblood}`,
+                      margin: '22px auto' }}/>
+        <p style={{
+          fontFamily: 'var(--sans)', fontSize: 14, lineHeight: '25px',
+          margin: '0 auto', color: TOKENS.stone, maxWidth: 460,
+        }}>Anywhere your travels take you.</p>
+      </Container>
+    </section>
+  );
+}
+window.SectionWhereWeMeet = SectionWhereWeMeet;
+
+
+/* ===== SectionDiscretion.jsx ===== */
+function SectionDiscretion() {
+  const paras = [
+    'Consors keeps no public profiles. No photographs are indexed. No correspondence is forwarded without consent on both sides.',
+    'Your verified credential is held in encrypted form and shared only at your initiation. Members’ notes written after any introduction are never published, never rated, and never named — they are read by our editors alone, and used to shape our concierge and editorial judgement.',
+  ];
+  return (
+    <section style={{ background: TOKENS.white, color: TOKENS.obsidian,
+                      padding: '128px 0' }}>
+      <Container style={{ maxWidth: 720 }}>
+        <div style={{ textAlign: 'center' }}>
+          <Eyebrow on="white">A NOTE ON DISCRETION</Eyebrow>
+        </div>
+        <div style={{ marginTop: 40 }}>
+          {paras.map((p, i) => (
+            <p key={i} style={{
+              fontFamily: 'var(--sans)', fontSize: 14, lineHeight: '25px',
+              margin: '0 auto 22px', maxWidth: 540,
+            }}>{p}</p>
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}
+window.SectionDiscretion = SectionDiscretion;
+
+
+/* ===== SectionApply.jsx ===== */
+function SectionApply() {
+  return (
+    <section style={{ background: TOKENS.obsidian, color: TOKENS.alabaster,
+                      padding: '128px 0' }}>
+      <Container style={{ textAlign: 'center', maxWidth: 720 }}>
+        <h2 style={{
+          fontFamily: 'var(--serif)', fontWeight: 400,
+          fontSize: 32, lineHeight: '38px',
+          margin: '0 auto 22px', maxWidth: 560,
+        }}>
+          Join by invitation, or by application
+        </h2>
+        <p style={{
+          fontFamily: 'var(--serif)', fontStyle: 'italic',
+          fontSize: 20, lineHeight: '30px',
+          color: TOKENS.goldLight, margin: '0 auto 40px',
+        }}>Applications are reviewed within seven days.</p>
+        <PrimaryBtn href="apply.html">Apply for membership</PrimaryBtn>
+
+        <div style={{ marginTop: 72, display: 'flex',
+                      justifyContent: 'center' }}>
+          <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQ0IiBoZWlnaHQ9IjE0NCIgdmlld0JveD0iMCAwIDE0NCAxNDQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xNDEgNzJDMTQxIDMzLjg5MjQgMTEwLjEwOCAzIDcyIDNDMzMuODkyNCAzIDMgMzMuODkyNCAzIDcyQzMgMTEwLjEwOCAzMy44OTI0IDE0MSA3MiAxNDFWMTQ0QzMyLjIzNTUgMTQ0IDAgMTExLjc2NSAwIDcyQzAgMzIuMjM1NSAzMi4yMzU1IDAgNzIgMEMxMTEuNzY1IDAgMTQ0IDMyLjIzNTUgMTQ0IDcyQzE0NCAxMTEuNzY1IDExMS43NjUgMTQ0IDcyIDE0NFYxNDFDMTEwLjEwOCAxNDEgMTQxIDExMC4xMDggMTQxIDcyWiIgZmlsbD0iI0I4OEM0RCI+PC9wYXRoPgo8cGF0aCBkPSJNMTMxIDcyQzEzMSAzOS40MTUyIDEwNC41ODUgMTMgNzIgMTNDMzkuNDE1MiAxMyAxMyAzOS40MTUyIDEzIDcyQzEzIDEwNC41ODUgMzkuNDE1MiAxMzEgNzIgMTMxVjEzNEMzNy43NTgzIDEzNCAxMCAxMDYuMjQyIDEwIDcyQzEwIDM3Ljc1ODMgMzcuNzU4MyAxMCA3MiAxMEMxMDYuMjQyIDEwIDEzNCAzNy43NTgzIDEzNCA3MkMxMzQgMTA2LjI0MiAxMDYuMjQyIDEzNCA3MiAxMzRWMTMxQzEwNC41ODUgMTMxIDEzMSAxMDQuNTg1IDEzMSA3MloiIGZpbGw9IiNCODhDNEQiPjwvcGF0aD4KPHBhdGggZD0iTTc0LjczODYgNDhDNzkuODI4NCA0OCA4NS4wNTQgNDkuMDg3OCA5MC43NTQ2IDUxLjE5NTVMOTIuMzgzMyA2Mi4wMDU3SDkwLjIxMTdDODcuMDg5OSA1NS4yMDY4IDgwLjg0NjQgNTAuOTIzNSA3NC4xMjc4IDUwLjkyMzVDNjQuODMwNCA1MC45MjM1IDU2LjIxMTYgNTcuOTk0MyA1Ni4yMTE2IDcxLjI1MjFDNTYuMjExNiA4My4yMTgxIDYzLjA2NTkgOTMuMDc2NSA3NS4wNzc5IDkzLjA3NjVDODIuOTUwMiA5My4wNzY1IDg4LjU4MjkgODkuMDY1MiA5MC4yMTE3IDgxLjY1NDRIOTIuNzIyN0w5Mi4zODMzIDkyLjMyODZDODcuNzY4NiA5NC4yMzIzIDc5LjYyNDggOTYgNzMuOTI0MiA5NkM1OC45OTQgOTYgNDggODYuNTQ5NiA0OCA3Mi44ODM5QzQ4IDU4Ljg3ODIgNTguNjU0NyA0OCA3NC43Mzg2IDQ4WiIgZmlsbD0iI0I4OEM0RCI+PC9wYXRoPgo8L3N2Zz4=" alt=""
+               width="36" height="36" style={{ display: 'block' }}/>
+        </div>
+        <div style={{
+          fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 500,
+          letterSpacing: '0.22em', textTransform: 'uppercase',
+          color: TOKENS.stone, marginTop: 22,
+        }}>Consors · MMXXVI</div>
+
+        <div style={{
+          marginTop: 40,
+          fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: 13,
+          color: TOKENS.stone,
+        }}>
+          {['Privacy','Terms','Editorial','Discretion','Partners'].map((l, i, arr) => (
+            <span key={l}>
+              <a style={{ border: 0, color: TOKENS.stone }}>{l}</a>
+              {i < arr.length - 1 && <span style={{ margin: '0 10px' }}>·</span>}
+            </span>
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}
+window.SectionApply = SectionApply;
+
+
+/* ===== ApplyPage.jsx ===== */
+function ApplyPage() {
+  const [form, setForm] = React.useState({
+    title: 'Mr', forename: '', surname: '',
+    contactPref: 'email',
+    email: '', dialCode: '+44', telephone: '',
+    city: '', nationality: '',
+    introduction: '',
+    referred: '',
+    notes: '',
+  });
+  const [submitted, setSubmitted] = React.useState(false);
+  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+  const setKey = (k, v) => setForm({ ...form, [k]: v });
+
+  if (submitted) {
+    return (
+      <div style={{ textAlign: 'center', padding: '120px 0', maxWidth: 620, margin: '0 auto' }}>
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQ0IiBoZWlnaHQ9IjE0NCIgdmlld0JveD0iMCAwIDE0NCAxNDQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xNDEgNzJDMTQxIDMzLjg5MjQgMTEwLjEwOCAzIDcyIDNDMzMuODkyNCAzIDMgMzMuODkyNCAzIDcyQzMgMTEwLjEwOCAzMy44OTI0IDE0MSA3MiAxNDFWMTQ0QzMyLjIzNTUgMTQ0IDAgMTExLjc2NSAwIDcyQzAgMzIuMjM1NSAzMi4yMzU1IDAgNzIgMEMxMTEuNzY1IDAgMTQ0IDMyLjIzNTUgMTQ0IDcyQzE0NCAxMTEuNzY1IDExMS43NjUgMTQ0IDcyIDE0NFYxNDFDMTEwLjEwOCAxNDEgMTQxIDExMC4xMDggMTQxIDcyWiIgZmlsbD0iI0I4OEM0RCI+PC9wYXRoPgo8cGF0aCBkPSJNMTMxIDcyQzEzMSAzOS40MTUyIDEwNC41ODUgMTMgNzIgMTNDMzkuNDE1MiAxMyAxMyAzOS40MTUyIDEzIDcyQzEzIDEwNC41ODUgMzkuNDE1MiAxMzEgNzIgMTMxVjEzNEMzNy43NTgzIDEzNCAxMCAxMDYuMjQyIDEwIDcyQzEwIDM3Ljc1ODMgMzcuNzU4MyAxMCA3MiAxMEMxMDYuMjQyIDEwIDEzNCAzNy43NTgzIDEzNCA3MkMxMzQgMTA2LjI0MiAxMDYuMjQyIDEzNCA3MiAxMzRWMTMxQzEwNC41ODUgMTMxIDEzMSAxMDQuNTg1IDEzMSA3MloiIGZpbGw9IiNCODhDNEQiPjwvcGF0aD4KPHBhdGggZD0iTTc0LjczODYgNDhDNzkuODI4NCA0OCA4NS4wNTQgNDkuMDg3OCA5MC43NTQ2IDUxLjE5NTVMOTIuMzgzMyA2Mi4wMDU3SDkwLjIxMTdDODcuMDg5OSA1NS4yMDY4IDgwLjg0NjQgNTAuOTIzNSA3NC4xMjc4IDUwLjkyMzVDNjQuODMwNCA1MC45MjM1IDU2LjIxMTYgNTcuOTk0MyA1Ni4yMTE2IDcxLjI1MjFDNTYuMjExNiA4My4yMTgxIDYzLjA2NTkgOTMuMDc2NSA3NS4wNzc5IDkzLjA3NjVDODIuOTUwMiA5My4wNzY1IDg4LjU4MjkgODkuMDY1MiA5MC4yMTE3IDgxLjY1NDRIOTIuNzIyN0w5Mi4zODMzIDkyLjMyODZDODcuNzY4NiA5NC4yMzIzIDc5LjYyNDggOTYgNzMuOTI0MiA5NkM1OC45OTQgOTYgNDggODYuNTQ5NiA0OCA3Mi44ODM5QzQ4IDU4Ljg3ODIgNTguNjU0NyA0OCA3NC43Mzg2IDQ4WiIgZmlsbD0iI0I4OEM0RCI+PC9wYXRoPgo8L3N2Zz4=" alt="" width="44" height="44"
+             style={{ display: 'inline-block', marginBottom: 40 }}/>
+        <Eyebrow on="dark">APPLICATION RECEIVED</Eyebrow>
+        <h2 style={{
+          fontFamily: 'var(--serif)', fontWeight: 400,
+          fontSize: 32, lineHeight: '38px',
+          margin: '40px auto 22px', maxWidth: 480, color: TOKENS.alabaster,
+        }}>Thank you, {form.forename || 'we will be in touch'}</h2>
+        <p style={{
+          fontFamily: 'var(--serif)', fontStyle: 'italic',
+          fontSize: 20, lineHeight: '30px', color: TOKENS.goldLight,
+          margin: '0 auto', maxWidth: 520,
+        }}>
+          An editor will review your application within seven days and write to
+          you at <span style={{ color: TOKENS.alabaster }}>
+            {form.contactPref === 'email'
+              ? form.email
+              : `${form.dialCode} ${form.telephone}`}
+          </span>.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ maxWidth: 640, margin: '0 auto', padding: '120px 0' }}>
+      <div style={{ textAlign: 'center', marginBottom: 72 }}>
+        <Eyebrow on="dark">BY APPLICATION</Eyebrow>
+        <h1 style={{
+          fontFamily: 'var(--serif)', fontWeight: 400,
+          fontSize: 46, lineHeight: '51px', letterSpacing: '-0.01em',
+          margin: '40px auto 22px', maxWidth: 520, color: TOKENS.alabaster,
+        }}>Apply for membership</h1>
+        <p style={{
+          fontFamily: 'var(--serif)', fontStyle: 'italic',
+          fontSize: 20, lineHeight: '30px', color: TOKENS.goldLight,
+          margin: '0 auto', maxWidth: 520,
+        }}>
+          Every application is dealt with by a real human being. No bots.
+          Absolute discretion is assured.
+        </p>
+      </div>
+
+      <form onSubmit={e => { e.preventDefault(); setSubmitted(true); }}>
+        <Fieldset title="About you">
+          <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr 1fr', gap: 24 }}>
+            <Field label="Title" value={form.title} onChange={set('title')}/>
+            <Field label="Forename" value={form.forename} onChange={set('forename')} required/>
+            <Field label="Surname" value={form.surname} onChange={set('surname')} required/>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+            <Field label="City of residence" value={form.city} onChange={set('city')} required/>
+            <Field label="Nationality" value={form.nationality} onChange={set('nationality')}/>
+          </div>
+
+          <ChoicePills
+            label="How shall we contact you"
+            value={form.contactPref}
+            onChange={(v) => setKey('contactPref', v)}
+            options={[
+              { value: 'email',  label: 'Email' },
+              { value: 'mobile', label: 'Mobile' },
+            ]}/>
+
+          {form.contactPref === 'email' ? (
+            <Field label="Email" type="email" autoComplete="email" required
+                   value={form.email} onChange={set('email')}/>
+          ) : (
+            <TelField required
+                      code={form.dialCode}
+                      onCodeChange={(v) => setKey('dialCode', v)}
+                      number={form.telephone}
+                      onNumberChange={(v) => setKey('telephone', v)}/>
+          )}
+        </Fieldset>
+
+        <div style={{ textAlign: 'center' }}>
+          <PrimaryBtn>Begin application process</PrimaryBtn>
+          <p style={{
+            fontFamily: 'var(--sans)', fontSize: 13, color: TOKENS.stone,
+            margin: '22px auto 0', maxWidth: 460, letterSpacing: '0.02em',
+          }}>
+            Your application is held in confidence. Membership terms are
+            discussed privately, by correspondence.
+          </p>
+        </div>
+      </form>
+    </div>
+  );
+}
+window.ApplyPage = ApplyPage;
+
+
+/* ===== SignInPage.jsx ===== */
+function SignInPage() {
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [submitted, setSubmitted] = React.useState(false);
+
+  if (submitted) {
+    return (
+      <div style={{ textAlign: 'center', padding: '120px 0' }}>
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQ0IiBoZWlnaHQ9IjE0NCIgdmlld0JveD0iMCAwIDE0NCAxNDQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xNDEgNzJDMTQxIDMzLjg5MjQgMTEwLjEwOCAzIDcyIDNDMzMuODkyNCAzIDMgMzMuODkyNCAzIDcyQzMgMTEwLjEwOCAzMy44OTI0IDE0MSA3MiAxNDFWMTQ0QzMyLjIzNTUgMTQ0IDAgMTExLjc2NSAwIDcyQzAgMzIuMjM1NSAzMi4yMzU1IDAgNzIgMEMxMTEuNzY1IDAgMTQ0IDMyLjIzNTUgMTQ0IDcyQzE0NCAxMTEuNzY1IDExMS43NjUgMTQ0IDcyIDE0NFYxNDFDMTEwLjEwOCAxNDEgMTQxIDExMC4xMDggMTQxIDcyWiIgZmlsbD0iI0I4OEM0RCI+PC9wYXRoPgo8cGF0aCBkPSJNMTMxIDcyQzEzMSAzOS40MTUyIDEwNC41ODUgMTMgNzIgMTNDMzkuNDE1MiAxMyAxMyAzOS40MTUyIDEzIDcyQzEzIDEwNC41ODUgMzkuNDE1MiAxMzEgNzIgMTMxVjEzNEMzNy43NTgzIDEzNCAxMCAxMDYuMjQyIDEwIDcyQzEwIDM3Ljc1ODMgMzcuNzU4MyAxMCA3MiAxMEMxMDYuMjQyIDEwIDEzNCAzNy43NTgzIDEzNCA3MkMxMzQgMTA2LjI0MiAxMDYuMjQyIDEzNCA3MiAxMzRWMTMxQzEwNC41ODUgMTMxIDEzMSAxMDQuNTg1IDEzMSA3MloiIGZpbGw9IiNCODhDNEQiPjwvcGF0aD4KPHBhdGggZD0iTTc0LjczODYgNDhDNzkuODI4NCA0OCA4NS4wNTQgNDkuMDg3OCA5MC43NTQ2IDUxLjE5NTVMOTIuMzgzMyA2Mi4wMDU3SDkwLjIxMTdDODcuMDg5OSA1NS4yMDY4IDgwLjg0NjQgNTAuOTIzNSA3NC4xMjc4IDUwLjkyMzVDNjQuODMwNCA1MC45MjM1IDU2LjIxMTYgNTcuOTk0MyA1Ni4yMTE2IDcxLjI1MjFDNTYuMjExNiA4My4yMTgxIDYzLjA2NTkgOTMuMDc2NSA3NS4wNzc5IDkzLjA3NjVDODIuOTUwMiA5My4wNzY1IDg4LjU4MjkgODkuMDY1MiA5MC4yMTE3IDgxLjY1NDRIOTIuNzIyN0w5Mi4zODMzIDkyLjMyODZDODcuNzY4NiA5NC4yMzIzIDc5LjYyNDggOTYgNzMuOTI0MiA5NkM1OC45OTQgOTYgNDggODYuNTQ5NiA0OCA3Mi44ODM5QzQ4IDU4Ljg3ODIgNTguNjU0NyA0OCA3NC43Mzg2IDQ4WiIgZmlsbD0iI0I4OEM0RCI+PC9wYXRoPgo8L3N2Zz4=" alt="" width="44" height="44"
+             style={{ display: 'inline-block', marginBottom: 40 }}/>
+        <h2 style={{
+          fontFamily: 'var(--serif)', fontWeight: 400,
+          fontSize: 32, lineHeight: '38px', margin: '0 auto 22px', maxWidth: 480,
+          color: TOKENS.alabaster,
+        }}>Check your inbox</h2>
+        <p style={{
+          fontFamily: 'var(--serif)', fontStyle: 'italic',
+          fontSize: 20, lineHeight: '30px', color: TOKENS.goldLight,
+          margin: '0 auto', maxWidth: 480,
+        }}>
+          We have sent a sign-in link to <span style={{ color: TOKENS.alabaster }}>{email}</span>. It will expire in fifteen minutes.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ maxWidth: 440, margin: '0 auto', padding: '120px 0' }}>
+      <div style={{ textAlign: 'center', marginBottom: 72 }}>
+        <Eyebrow on="dark">MEMBERS' ENTRANCE</Eyebrow>
+        <h1 style={{
+          fontFamily: 'var(--serif)', fontWeight: 400,
+          fontSize: 32, lineHeight: '38px',
+          margin: '40px 0 0', color: TOKENS.alabaster,
+        }}>Sign in</h1>
+      </div>
+
+      <form onSubmit={e => { e.preventDefault(); setSubmitted(true); }}>
+        <Field label="Email" type="email" name="email" autoComplete="email"
+               required value={email} onChange={e => setEmail(e.target.value)}/>
+        <Field label="Password" type="password" name="password"
+               autoComplete="current-password" required
+               value={password} onChange={e => setPassword(e.target.value)}/>
+
+        <div style={{ marginTop: 40, textAlign: 'center' }}>
+          <PrimaryBtn>Continue</PrimaryBtn>
+        </div>
+
+        <div style={{
+          marginTop: 40, textAlign: 'center',
+          fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: 13,
+          color: TOKENS.stone,
+        }}>
+          <a href="forgot-password.html" style={{ color: TOKENS.stone, border: 0, cursor: 'pointer' }}>
+            Forgotten password
+          </a>
+          <span style={{ margin: '0 10px' }}>·</span>
+          <a href="apply.html" style={{ color: TOKENS.stone, border: 0 }}>
+            Apply for membership
+          </a>
+        </div>
+      </form>
+    </div>
+  );
+}
+window.SignInPage = SignInPage;
+
+
+/* ===== ForgotPasswordPage.jsx ===== */
+function ForgotPasswordPage() {
+  const [email, setEmail] = React.useState('');
+  const [submitted, setSubmitted] = React.useState(false);
+
+  if (submitted) {
+    return (
+      <div style={{ textAlign: 'center', padding: '120px 0',
+                    maxWidth: 560, margin: '0 auto' }}>
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQ0IiBoZWlnaHQ9IjE0NCIgdmlld0JveD0iMCAwIDE0NCAxNDQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xNDEgNzJDMTQxIDMzLjg5MjQgMTEwLjEwOCAzIDcyIDNDMzMuODkyNCAzIDMgMzMuODkyNCAzIDcyQzMgMTEwLjEwOCAzMy44OTI0IDE0MSA3MiAxNDFWMTQ0QzMyLjIzNTUgMTQ0IDAgMTExLjc2NSAwIDcyQzAgMzIuMjM1NSAzMi4yMzU1IDAgNzIgMEMxMTEuNzY1IDAgMTQ0IDMyLjIzNTUgMTQ0IDcyQzE0NCAxMTEuNzY1IDExMS43NjUgMTQ0IDcyIDE0NFYxNDFDMTEwLjEwOCAxNDEgMTQxIDExMC4xMDggMTQxIDcyWiIgZmlsbD0iI0I4OEM0RCI+PC9wYXRoPgo8cGF0aCBkPSJNMTMxIDcyQzEzMSAzOS40MTUyIDEwNC41ODUgMTMgNzIgMTNDMzkuNDE1MiAxMyAxMyAzOS40MTUyIDEzIDcyQzEzIDEwNC41ODUgMzkuNDE1MiAxMzEgNzIgMTMxVjEzNEMzNy43NTgzIDEzNCAxMCAxMDYuMjQyIDEwIDcyQzEwIDM3Ljc1ODMgMzcuNzU4MyAxMCA3MiAxMEMxMDYuMjQyIDEwIDEzNCAzNy43NTgzIDEzNCA3MkMxMzQgMTA2LjI0MiAxMDYuMjQyIDEzNCA3MiAxMzRWMTMxQzEwNC41ODUgMTMxIDEzMSAxMDQuNTg1IDEzMSA3MloiIGZpbGw9IiNCODhDNEQiPjwvcGF0aD4KPHBhdGggZD0iTTc0LjczODYgNDhDNzkuODI4NCA0OCA4NS4wNTQgNDkuMDg3OCA5MC43NTQ2IDUxLjE5NTVMOTIuMzgzMyA2Mi4wMDU3SDkwLjIxMTdDODcuMDg5OSA1NS4yMDY4IDgwLjg0NjQgNTAuOTIzNSA3NC4xMjc4IDUwLjkyMzVDNjQuODMwNCA1MC45MjM1IDU2LjIxMTYgNTcuOTk0MyA1Ni4yMTE2IDcxLjI1MjFDNTYuMjExNiA4My4yMTgxIDYzLjA2NTkgOTMuMDc2NSA3NS4wNzc5IDkzLjA3NjVDODIuOTUwMiA5My4wNzY1IDg4LjU4MjkgODkuMDY1MiA5MC4yMTE3IDgxLjY1NDRIOTIuNzIyN0w5Mi4zODMzIDkyLjMyODZDODcuNzY4NiA5NC4yMzIzIDc5LjYyNDggOTYgNzMuOTI0MiA5NkM1OC45OTQgOTYgNDggODYuNTQ5NiA0OCA3Mi44ODM5QzQ4IDU4Ljg3ODIgNTguNjU0NyA0OCA3NC43Mzg2IDQ4WiIgZmlsbD0iI0I4OEM0RCI+PC9wYXRoPgo8L3N2Zz4=" alt="" width="44" height="44"
+             style={{ display: 'inline-block', marginBottom: 40 }}/>
+        <Eyebrow on="dark">A LINK IS ON ITS WAY</Eyebrow>
+        <h2 style={{
+          fontFamily: 'var(--serif)', fontWeight: 400,
+          fontSize: 32, lineHeight: '38px',
+          margin: '40px auto 22px', maxWidth: 480, color: TOKENS.alabaster,
+        }}>Check your inbox</h2>
+        <p style={{
+          fontFamily: 'var(--serif)', fontStyle: 'italic',
+          fontSize: 20, lineHeight: '30px', color: TOKENS.goldLight,
+          margin: '0 auto 40px', maxWidth: 480,
+        }}>
+          If an account exists for <span style={{ color: TOKENS.alabaster }}>{email}</span>,
+          we have sent a link to reset your password. It will expire in thirty minutes.
+        </p>
+        <div style={{
+          fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: 13,
+          color: TOKENS.stone,
+        }}>
+          <a href="signin.html" style={{ color: TOKENS.stone, border: 0 }}>
+            ← Return to sign in
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ maxWidth: 440, margin: '0 auto', padding: '120px 0' }}>
+      <div style={{ textAlign: 'center', marginBottom: 56 }}>
+        <Eyebrow on="dark">A MOMENT'S FORGETFULNESS</Eyebrow>
+        <h1 style={{
+          fontFamily: 'var(--serif)', fontWeight: 400,
+          fontSize: 32, lineHeight: '38px',
+          margin: '40px 0 22px', color: TOKENS.alabaster,
+        }}>Reset your password</h1>
+        <p style={{
+          fontFamily: 'var(--serif)', fontStyle: 'italic',
+          fontSize: 16, lineHeight: '26px', color: TOKENS.goldLight,
+          margin: '0 auto', maxWidth: 400,
+        }}>
+          Enter the email address on your account. We shall send you a link
+          to set a new one.
+        </p>
+      </div>
+
+      <form onSubmit={e => { e.preventDefault(); setSubmitted(true); }}>
+        <Field label="Email" type="email" name="email" autoComplete="email"
+               required value={email} onChange={e => setEmail(e.target.value)}/>
+
+        <div style={{ marginTop: 40, textAlign: 'center' }}>
+          <PrimaryBtn>Send reset link</PrimaryBtn>
+        </div>
+
+        <div style={{
+          marginTop: 40, textAlign: 'center',
+          fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: 13,
+          color: TOKENS.stone,
+        }}>
+          <a href="signin.html" style={{ color: TOKENS.stone, border: 0 }}>
+            Return to sign in
+          </a>
+          <span style={{ margin: '0 10px' }}>·</span>
+          <a href="apply.html" style={{ color: TOKENS.stone, border: 0 }}>
+            Apply for membership
+          </a>
+        </div>
+      </form>
+    </div>
+  );
+}
+window.ForgotPasswordPage = ForgotPasswordPage;
+
+
+
+function Site() {
+  const { tweaks, set, open } = useTweaks();
+  return (
+    <>
+      <Nav/>
+      <SectionHero underCtaAlign={tweaks.underCtaAlign}/>
+      <SectionPhilosophy/>
+      <SectionCredential/>
+      <SectionMembership/>
+      <SectionPullQuote
+        fontSize={tweaks.quoteFontSize}
+        lineHeight={tweaks.quoteLineHeight}
+        maxWidth={tweaks.quoteMaxWidth}/>
+      <SectionAgencies/>
+      <SectionWhereWeMeet/>
+      <SectionDiscretion/>
+      <SectionApply/>
+      <TweaksPanel tweaks={tweaks} set={set} open={open}/>
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById('app')).render(<Site/>);
+
+</script>
+</body></html>
